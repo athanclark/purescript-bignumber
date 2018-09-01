@@ -5,17 +5,20 @@ module Data.BigNumber
   , roundHalfUp, roundHalfDown, roundHalfEven, roundHalfCeil, roundHalfFloor
   , ModuloMode, modRoundUp, modRoundDown, modRoundFloor, modRoundHalfEven
   , modEuclid
-  , isBigNumber, maxBigNumber, minBigNumber, randomBigNumber
+  , isBigNumber, randomBigNumber
   ) where
 
 import Prelude
+import Data.Int as Int
 import Data.Either (Either (..))
-import Data.Function.Uncurried (Fn3, runFn3, Fn2, runFn2)
+import Data.Function.Uncurried (Fn3, runFn3, Fn2, runFn2, Fn5, runFn5)
 import Data.Record.Class (class Subrow)
 import Data.Tuple.Native (T2)
+-- import Data.Semiring (class Semiring)
 import Control.Monad.Eff (Eff, kind Effect)
 import Control.Monad.Eff.Exception (Error)
 import Control.Monad.Eff.Uncurried (EffFn1, runEffFn1)
+import Partial.Unsafe (unsafePartial)
 
 
 foreign import data BIGNUMBER :: Effect
@@ -85,15 +88,63 @@ config = runEffFn1 configImpl
 
 
 foreign import isBigNumber :: forall a. a -> Boolean
-
-foreign import maxBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
-
-maxBigNumber :: BigNumber -> BigNumber -> BigNumber
-maxBigNumber = runFn2 maxBigNumberImpl
-
-foreign import minBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
-
-minBigNumber :: BigNumber -> BigNumber -> BigNumber
-minBigNumber = runFn2 minBigNumberImpl
-
 foreign import randomBigNumber :: forall eff. Eff (bigNumber :: BIGNUMBER | eff) BigNumber
+foreign import compareBigNumberImpl :: Fn5 Ordering Ordering Ordering BigNumber BigNumber Ordering
+foreign import absBigNumber :: BigNumber -> BigNumber
+foreign import divBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import idivBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import powBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import intValue :: BigNumber -> BigNumber
+foreign import eqBigNumberImpl :: Fn2 BigNumber BigNumber Boolean
+foreign import isFinite :: BigNumber -> Boolean
+foreign import gtBigNumberImpl :: Fn2 BigNumber BigNumber Boolean
+foreign import gteBigNumberImpl :: Fn2 BigNumber BigNumber Boolean
+foreign import isInteger :: BigNumber -> Boolean
+foreign import ltBigNumberImpl :: Fn2 BigNumber BigNumber Boolean
+foreign import lteBigNumberImpl :: Fn2 BigNumber BigNumber Boolean
+foreign import isNaN :: BigNumber -> Boolean
+foreign import isNegative :: BigNumber -> Boolean
+foreign import isPositive :: BigNumber -> Boolean
+foreign import isZero :: BigNumber -> Boolean
+foreign import plusBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import minusBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import moduloBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import timesBigNumberImpl :: Fn2 BigNumber BigNumber BigNumber
+foreign import negateBigNumber :: BigNumber -> BigNumber
+foreign import precisionBigNumberImpl :: Fn2 BigNumber Int BigNumber
+foreign import toNumber :: BigNumber -> Number
+foreign import toString :: BigNumber -> String
+foreign import sqrt :: BigNumber -> BigNumber
+
+
+instance eqBigNumber :: Eq BigNumber where
+  eq = runFn2 eqBigNumberImpl
+
+instance ordBigNumber :: Ord BigNumber where
+  compare = runFn5 compareBigNumberImpl LT EQ GT
+
+instance showBigNumber :: Show BigNumber where
+  show = toString
+
+instance semiringBigNumber :: Semiring BigNumber where
+  add = runFn2 plusBigNumberImpl
+  zero = unsafePartial $ case parseBigNumber "0" of
+    Right x -> x
+  one = unsafePartial $ case parseBigNumber "1" of
+    Right x -> x
+  mul = runFn2 timesBigNumberImpl
+
+instance ringBigNumber :: Ring BigNumber where
+  sub = runFn2 minusBigNumberImpl
+
+instance commutativeRingBigNumber :: CommutativeRing BigNumber
+
+instance divisionRingBigNumber :: DivisionRing BigNumber where
+  recip = runFn2 divBigNumberImpl one
+
+instance euclideanRingBigNumber :: EuclideanRing BigNumber where
+  degree = Int.floor <<< toNumber <<< intValue <<< absBigNumber
+  div = runFn2 divBigNumberImpl
+  mod = runFn2 moduloBigNumberImpl
+
+instance fieldBigNumber :: Field BigNumber

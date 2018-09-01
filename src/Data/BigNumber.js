@@ -23,16 +23,120 @@ exports.isBigNumber = function isBigNumber (x) {
 };
 
 
-exports.maxBigNumberImpl = function maxBigNumberImpl (x,y) {
-    return BigNumber.maximum(x,y);
-};
-
-
-exports.minBigNumberImpl = function minBigNumberImpl (x,y) {
-    return BigNumber.minimum(x,y);
-};
-
-
 exports.randomBigNumber = function randomBigNumber () {
     return BigNumber.random();
+};
+
+
+exports.absBigNumber = function absBigNumber (x) {
+    return x.abs();
+};
+
+
+exports.compareBigNumberImpl = function compareBigNumberImpl (LT,EQ,GT,x,y) {
+    var r = x.comparedTo(y);
+    if (r === -1) {
+        return LT;
+    } else if (r === 0) {
+        return EQ;
+    } else if (r === 1) {
+        return GT;
+    }
+};
+
+
+exports.divBigNumberImpl = function divBigNumberImpl (x,y) {
+    return x.div(y);
+};
+
+exports.idivBigNumberImpl = function idivBigNumberImpl (x,y) {
+    return x.idiv(y);
+};
+
+exports.powBigNumberImpl = function powBigNumberImpl (x,y) {
+    return x.pow(y);
+};
+
+exports.intValue = function intValue (x) {
+    return x.integerValue();
+};
+
+exports.eqBigNumberImpl = function eqBigNumberImpl (x,y) {
+    return x.eq(y);
+};
+
+exports.isFinite = function isFinite (x) {
+    return x.isFinite();
+};
+
+exports.gtBigNumberImpl = function gtBigNumberImpl (x,y) {
+    return x.gt(y);
+};
+
+exports.gteBigNumberImpl = function gteBigNumberImpl (x,y) {
+    return x.gte(y);
+};
+
+exports.isInteger = function isInteger (x) {
+    return x.isInteger();
+};
+
+exports.ltBigNumberImpl = function ltBigNumberImpl (x,y) {
+    return x.lt(y);
+};
+
+exports.lteBigNumberImpl = function lteBigNumberImpl (x,y) {
+    return x.lte(y);
+};
+
+exports.isNaN = function isNaN (x) {
+    return x.isNaN();
+};
+
+exports.isNegative = function isNegative (x) {
+    return x.isNegative();
+};
+
+exports.isPositive = function isPositive (x) {
+    return x.isPositive();
+};
+
+exports.isZero = function isZero (x) {
+    return x.isZero();
+};
+
+exports.minusBigNumberImpl = function minusBigNumberImpl (x,y) {
+    return x.minus(y);
+};
+
+exports.moduloBigNumberImpl = function moduloBigNumberImpl (x,y) {
+    return x.modulo(y);
+};
+
+exports.timesBigNumberImpl = function timesBigNumberImpl (x,y) {
+    return x.times(y);
+};
+
+exports.negateBigNumber = function negateBigNumber (x) {
+    return x.negated();
+};
+
+exports.plusBigNumberImpl = function plusBigNumberImpl (x,y) {
+    return x.plus(y);
+};
+
+exports.precisionBigNumberImpl = function precisionBigNumberImpl (x,y) {
+    return x.precision(y);
+};
+
+exports.toNumber = function toNumber (x) {
+    return x.toNumber();
+};
+
+exports.toString = function toString (x) {
+    return x.toString();
+};
+
+exports.sqrt = function sqrt (x) {
+    return x.sqrt();
 };
