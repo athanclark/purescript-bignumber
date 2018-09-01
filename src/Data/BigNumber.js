@@ -28,7 +28,7 @@ exports.randomBigNumber = function randomBigNumber () {
 };
 
 
-exports.absBigNumber = function absBigNumber (x) {
+exports.absImpl = function absImpl (x) {
     return x.abs();
 };
 
@@ -44,6 +44,10 @@ exports.compareBigNumberImpl = function compareBigNumberImpl (LT,EQ,GT,x,y) {
     }
 };
 
+
+exports.decimalPlacesImpl = function decimalPlacesImpl (x,y) {
+    return x.decimalPlaces(y);
+};
 
 exports.divBigNumberImpl = function divBigNumberImpl (x,y) {
     return x.div(y);
@@ -117,7 +121,7 @@ exports.timesBigNumberImpl = function timesBigNumberImpl (x,y) {
     return x.times(y);
 };
 
-exports.negateBigNumber = function negateBigNumber (x) {
+exports.negateImpl = function negateImpl (x) {
     return x.negated();
 };
 
@@ -125,8 +129,12 @@ exports.plusBigNumberImpl = function plusBigNumberImpl (x,y) {
     return x.plus(y);
 };
 
-exports.precisionBigNumberImpl = function precisionBigNumberImpl (x,y) {
+exports.precisionImpl = function precisionImpl (x,y) {
     return x.precision(y);
+};
+
+exports.shiftedByImpl = function shiftedByImpl (x,y) {
+    return x.shiftedBy(y);
 };
 
 exports.toNumber = function toNumber (x) {
@@ -135,6 +143,26 @@ exports.toNumber = function toNumber (x) {
 
 exports.toString = function toString (x) {
     return x.toString();
+};
+
+exports.toExponential = function toExponential (x) {
+    return x.toExponential();
+};
+
+exports.toFixed = function toFixed (x) {
+    return x.toFixed();
+};
+
+exports.toFormat = function toFormat (x) {
+    return x.toFormat();
+};
+
+exports.toFractionImpl = function toFractionImpl (x) {
+    return x.toFraction();
+};
+
+exports.valueOf = function valueOf (x) {
+    return x.valueOf();
 };
 
 exports.sqrt = function sqrt (x) {
