@@ -13,13 +13,17 @@ module Data.BigNumber
 
 import Prelude
 import Data.Int as Int
+import Data.Maybe (Maybe (..))
 import Data.Either (Either (..))
 import Data.Tuple (Tuple (..))
 import Data.Function.Uncurried (Fn3, runFn3, Fn2, runFn2, Fn5, runFn5)
 import Data.Record.Class (class Subrow)
 import Data.Tuple.Native (T2, prj)
 import Data.Typelevel.Num.Reps (d0, d1)
--- import Data.Semiring (class Semiring)
+import Data.Generic
+  (class Generic, toSpine, fromSpine, GenericSpine (SProd), GenericSignature (SigProd))
+import Data.Array as Array
+import Type.Proxy (Proxy (..))
 import Control.Monad.Eff (Eff, kind Effect)
 import Control.Monad.Eff.Exception (Error)
 import Control.Monad.Eff.Uncurried (EffFn1, runEffFn1)
@@ -29,6 +33,21 @@ import Partial.Unsafe (unsafePartial)
 foreign import data BIGNUMBER :: Effect
 
 foreign import data BigNumber :: Type
+
+instance genericBigNumber :: Generic BigNumber where
+  toSpine x = SProd "Data.BigNumber.BigNumber" [\_ -> toSpine (toString x)]
+  toSignature Proxy = SigProd "Data.BigNumber.BigNumber" []
+  fromSpine s = case s of
+    SProd tag xs
+      | tag == "Data.BigNumber.BigNumber" -> case Array.head xs of
+        Just f -> do
+          n <- fromSpine (f unit)
+          case parseBigNumber n of
+            Left _ -> Nothing
+            Right x -> pure x
+        Nothing -> Nothing
+      | otherwise -> Nothing
+    _ -> Nothing
 
 
 foreign import parseBigNumberImpl :: Fn3 (forall e a. e -> Either e a) (forall e a. a -> Either e a) String (Either Error BigNumber)

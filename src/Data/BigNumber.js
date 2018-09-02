@@ -9,7 +9,7 @@ exports.parseBigNumberImpl = function parseBigNumberImpl (Left,Right,s) {
     } catch (e) {
         return Left(e);
     }
-    return x;
+    return Right(x);
 };
 
 

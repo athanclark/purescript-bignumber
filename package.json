@@ -1,7 +1,6 @@
 {
   "name": "purescript-bignumber",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -10,5 +9,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/athanclark/purescript-bignumber.git"
+  },
+  "bugs": {
+    "url": "https://github.com/athanclark/purescript-bignumber/issues"
+  },
+  "homepage": "https://github.com/athanclark/purescript-bignumber#readme",
+  "description": "",
+  "dependencies": {
+    "bignumber.js": "^7.2.1"
+  }
 }
