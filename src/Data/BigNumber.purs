@@ -1,5 +1,5 @@
 module Data.BigNumber
-  ( BIGNUMBER, BigNumber, parseBigNumber, config
+  ( BigNumber, parseBigNumber, config
   , ConfigParams, RoundingMode
   , roundUp, roundDown, roundCeil, roundFloor
   , roundHalfUp, roundHalfDown, roundHalfEven, roundHalfCeil, roundHalfFloor
@@ -13,41 +13,26 @@ module Data.BigNumber
 
 import Prelude
 import Data.Int as Int
-import Data.Maybe (Maybe (..))
 import Data.Either (Either (..))
 import Data.Tuple (Tuple (..))
 import Data.Function.Uncurried (Fn3, runFn3, Fn2, runFn2, Fn5, runFn5)
-import Data.Record.Class (class Subrow)
 import Data.Tuple.Native (T2, prj)
 import Data.Typelevel.Num.Reps (d0, d1)
-import Data.Generic
-  (class Generic, toSpine, fromSpine, GenericSpine (SProd), GenericSignature (SigProd))
-import Data.Array as Array
-import Type.Proxy (Proxy (..))
-import Control.Monad.Eff (Eff, kind Effect)
-import Control.Monad.Eff.Exception (Error)
-import Control.Monad.Eff.Uncurried (EffFn1, runEffFn1)
+import Data.Generic.Rep (class Generic, Constructor (..), Argument (..))
+import Row.Class (class SubRow)
+import Effect (Effect)
+import Effect.Exception (Error)
+import Effect.Uncurried (EffectFn1, runEffectFn1)
 import Partial.Unsafe (unsafePartial)
 
 
-foreign import data BIGNUMBER :: Effect
 
 foreign import data BigNumber :: Type
 
-instance genericBigNumber :: Generic BigNumber where
-  toSpine x = SProd "Data.BigNumber.BigNumber" [\_ -> toSpine (toString x)]
-  toSignature Proxy = SigProd "Data.BigNumber.BigNumber" []
-  fromSpine s = case s of
-    SProd tag xs
-      | tag == "Data.BigNumber.BigNumber" -> case Array.head xs of
-        Just f -> do
-          n <- fromSpine (f unit)
-          case parseBigNumber n of
-            Left _ -> Nothing
-            Right x -> pure x
-        Nothing -> Nothing
-      | otherwise -> Nothing
-    _ -> Nothing
+instance genericBigNumber :: Generic BigNumber (Constructor "BigNumber" (Argument String)) where
+  from x = Constructor (Argument (toString x))
+  to (Constructor (Argument s)) = unsafePartial $ case parseBigNumber s of
+    Right x -> x
 
 
 foreign import parseBigNumberImpl :: Fn3 (forall e a. e -> Either e a) (forall e a. a -> Either e a) String (Either Error BigNumber)
@@ -55,7 +40,7 @@ foreign import parseBigNumberImpl :: Fn3 (forall e a. e -> Either e a) (forall e
 parseBigNumber :: String -> Either Error BigNumber
 parseBigNumber = runFn3 parseBigNumberImpl Left Right
 
-foreign import configImpl :: forall o eff. EffFn1 (bigNumber :: BIGNUMBER | eff) o Unit
+foreign import configImpl :: forall o. EffectFn1 o Unit
 
 newtype RoundingMode = RoundingMode Int
 
@@ -115,11 +100,11 @@ type ConfigParams format =
   , "ALPHABET" :: String
   )
 
-config :: forall o format eff
-        . Subrow o (ConfigParams { | format })
-       => Subrow format FormatParams
-       => { | o } -> Eff (bigNumber :: BIGNUMBER | eff) Unit
-config = runEffFn1 configImpl
+config :: forall o format
+        . SubRow o (ConfigParams { | format })
+       => SubRow format FormatParams
+       => { | o } -> Effect Unit
+config = runEffectFn1 configImpl
 
 
 foreign import isBigNumber :: forall a. a -> Boolean
@@ -176,7 +161,7 @@ pow = runFn2 powBigNumberImpl
 foreign import intValue :: BigNumber -> BigNumber
 foreign import precisionImpl :: Fn2 BigNumber Int BigNumber
 foreign import decimalPlacesImpl :: Fn2 BigNumber Int BigNumber
-foreign import randomBigNumber :: forall eff. Eff (bigNumber :: BIGNUMBER | eff) BigNumber
+foreign import randomBigNumber :: Effect BigNumber
 foreign import shiftedByImpl :: Fn2 BigNumber Int BigNumber
 
 precision :: BigNumber -> Int -> BigNumber
@@ -187,6 +172,8 @@ decimalPlaces = runFn2 decimalPlacesImpl
 
 shiftedBy :: BigNumber -> Int -> BigNumber
 shiftedBy = runFn2 shiftedByImpl
+
+
 
 
 instance eqBigNumber :: Eq BigNumber where
@@ -218,5 +205,3 @@ instance euclideanRingBigNumber :: EuclideanRing BigNumber where
   degree = Int.floor <<< toNumber <<< intValue <<< abs'
   div = runFn2 divBigNumberImpl
   mod = runFn2 moduloBigNumberImpl
-
-instance fieldBigNumber :: Field BigNumber
