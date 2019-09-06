@@ -11,7 +11,7 @@
     "purescript-prelude": "^4.1.0",
     "purescript-either": "^4.0.0",
     "purescript-exceptions": "^4.0.0",
-    "purescript-tuples-native": "git://github.com/athanclark/purescript-tuples-native.git#fa290264e96c146c4acdad95eee4e8cfdeb6fb2b",
+    "purescript-tuples-native": "^2.0.1",
     "purescript-integers": "^4.0.0",
     "purescript-functions": "^4.0.0",
     "purescript-generics-rep": "^6.1.0",
